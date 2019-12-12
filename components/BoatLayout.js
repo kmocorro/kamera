@@ -29,8 +29,13 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 import { createWorker } from 'tesseract.js';
+import boat from '../pages/boat';
+
+import router from 'next/router';
 
 
 /// essentials-----------------
@@ -104,8 +109,40 @@ export default function Layout(props) {
     const classes = useStyles();
     const user = props.data;
     const worker = createWorker();
+    console.log(props);
     
     const [ boatID, setBoatID ] = useState('');
+    const [ newBoatID, setNewBoatID ] = useState('');
+    const [ successResponse, setSuccessResponse ] = useState(false);
+    
+    function handleOnChangeNewBoatID(e){
+        setNewBoatID(e.target.value);
+    }
+
+    async function handleOnClickSubmit(e){
+        e.preventDefault();
+
+        const url = `http://dev-metaspf401.sunpowercorp.com:8080/api/updatesicboat`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    id: props.imgSrcId,
+                    final_sic_id: newBoatID.replace(/[\n\r]+/g, '')
+                })
+            });
+
+            console.log(response, ' This is the response...');
+            setSuccessResponse(true);
+
+        } catch (error) {
+
+            console.log(error, ' This is an error...');
+            setSuccessResponse(false);
+        }
+    }
 
     /**
      What does useEffect do? By using this Hook, you tell React that your component needs to do something after render. React will remember the function you passed (we’ll refer to it as our “effect”), and call it later after performing the DOM updates. In this effect, we set the document title, but we could also perform data fetching or call some other imperative API.
@@ -120,10 +157,13 @@ export default function Layout(props) {
     
             if(data.data.lines.length == 3){
                 setBoatID(data.data.lines[2].text);
+                setNewBoatID(data.data.lines[2].text);
             } else if (data.data.lines.length == 2){
                 setBoatID(data.data.lines[1].text);
+                setNewBoatID(data.data.lines[1].text);
             } else {;
                 setBoatID(data.data.lines[0].text);
+                setNewBoatID(data.data.lines[0].text);
             }
 
             await worker.terminate();
@@ -138,9 +178,11 @@ export default function Layout(props) {
         <AppBar position="relative" style={{backgroundColor: '#fff', boxShadow: '0px 0px 0px 0px rgba(0,0,0,0.2), 0px 0px 0px 1px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)    '}}>
             <Toolbar>
             <DeviceHub className={classes.icon}/>
-            <Typography variant="h6" color="textPrimary">
-                META
-            </Typography>
+            <Link href="/">
+                <Typography variant="h6" color="textPrimary">
+                    META
+                </Typography>
+            </Link>
             <Grid
                 container
                 direction="row"
@@ -165,11 +207,59 @@ export default function Layout(props) {
             {/* Hero unit */}
             <div className={classes.heroContent}>
             <Container maxWidth="sm">
-
-                <Grid>
-                    <Grid item>
+                <Grid container spacing={2} justify="center">
+                    <Grid item xs={12} sm={12} md={12} align="center">
                         <img src={`data:image/png;base64,${props.imageSrcBase64}`} alt={props.imageId} />
-                        <p>{boatID}</p>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                        {
+                            boatID ?
+                                <Fragment>
+                                <Typography variant="h3" align="center" gutterBottom>
+                                    {newBoatID}
+                                </Typography>
+                                <TextField
+                                    required
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Guesstimate SiC ID:"
+                                    value={newBoatID}
+                                    onChange={handleOnChangeNewBoatID}
+                                    style={{fontSize: 22}}
+                                />
+                                <Typography variant="body2" color="textSecondary" gutterBottom>By clicking submit, you indicate that the guesstimate value is correct. This will be saved to Final SiC ID for traceability.</Typography>
+                                
+                                {
+                                    newBoatID.length > 4 ?
+                                        successResponse ?
+                                            <Fragment>
+                                            <Typography variant="h4" align="center">
+                                                Final SiC ID Updated!
+                                            </Typography>
+                                            <Link href="/">
+                                                <Button align="center" fullWidth>
+                                                    Back
+                                                </Button>
+                                            </Link>
+                                            </Fragment>
+                                        :
+                                        <Button fullWidth variant="contained" color="secondary" size="large" onClick={handleOnClickSubmit}>
+                                            Submit
+                                        </Button>
+                                    :
+                                    <></>
+                                }
+                                </Fragment>
+                            :
+                            <Fragment>
+                                <Grid container spacing={2} justify="center">
+                                    <Grid item align="center">
+                                        <CircularProgress color="secondary" />
+                                    </Grid>
+                                </Grid>
+
+                            </Fragment>
+                        }
                     </Grid>
                 </Grid>
                

@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import URLSafeBase64 from 'urlsafe-base64';
 
 function Boat(props){
+  
     const router = useRouter();
     const imageSrcBuff = URLSafeBase64.decode(router.query.src);
     const imageSrcBase64 = URLSafeBase64.decode(router.query.src).toString('base64');
@@ -45,20 +46,17 @@ Boat.getInitialProps = async ctx => {
         }
       });
   
-      //console.log(response.statusText);
+      const js = await response.json()
+      return js;
+
   
-      if (response.statusText === 'OK') {
-        const js = await response.json()
-        //console.log('js', js)
-        return js
-      } else {
-        // https://github.com/developit/unfetch#caveats
-        return await redirectOnError()
-      }
     } catch (error) {
       // Implementation or Network error
-      return redirectOnError()
+      console.log(error);
+      console.log('catch errorrrrr.')
+
     }
+
   }
   
 

@@ -5,7 +5,7 @@ import cookie from 'js-cookie'
 
 function login ({ token }) {
   cookie.set('token', token, { expires: 1 })
-  Router.push('/')
+  Router.push('/error', '/')
 }
 
 function logout () {

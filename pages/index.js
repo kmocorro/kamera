@@ -9,6 +9,7 @@ import { withAuthSync, logout } from '../utils/auth'
 import getHost from '../utils/get-host'
 
 function Index(props){
+  console.log(props);
 
   return (
       <Fragment>
@@ -36,20 +37,13 @@ Index.getInitialProps = async ctx => {
           Authorization: JSON.stringify({ token })
         }
       });
+      
+      const js = await response.json()
+      return js;
   
-      //console.log(response.statusText);
-  
-      if (response.statusText === 'OK') {
-        const js = await response.json()
-        //console.log('js', js)
-        return js
-      } else {
-        // https://github.com/developit/unfetch#caveats
-        return await redirectOnError()
-      }
     } catch (error) {
       // Implementation or Network error
-      return redirectOnError()
+      console.log(error);
     }
   }
   
