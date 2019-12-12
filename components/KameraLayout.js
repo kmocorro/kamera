@@ -141,23 +141,29 @@ export default function Layout(props) {
                 <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
                     <ListSubheader component="div"></ListSubheader>
                 </GridListTile>
-                { boat.map(tile => (
-                    <GridListTile key={tile.id}>
-                        <img src={`data:image/png;base64,${tile.base64_sic_id_image}`} alt={tile.sic_id} />
-                        <GridListTileBar
-                        title={tile.sic_id}
-                        subtitle={<span>{tile.insert_time}</span>}
-                        actionIcon={
-                            <NextLink href={`/boat?id=${tile.id}&src=${tile.urlsafe_sic_id_image}`}>
-                                <IconButton aria-label={`edit id: ${tile.id}`} className={classes.icon}>
-                                    <InfoIcon />
-                                </IconButton>
-                            </NextLink>
-                        }
-                        />
-                    </GridListTile>
-                    
-                ))
+                { 
+                boat.length > 0 ?
+                    boat.map(tile => (
+                        <GridListTile key={tile.id}>
+                            <img src={`data:image/png;base64,${tile.base64_sic_id_image}`} alt={tile.sic_id} />
+                            <GridListTileBar
+                            title={tile.sic_id}
+                            subtitle={<span>{tile.insert_time}</span>}
+                            actionIcon={
+                                <NextLink href={`/boat?id=${tile.id}&src=${tile.urlsafe_sic_id_image}`}>
+                                    <IconButton aria-label={`edit id: ${tile.id}`} className={classes.icon}>
+                                        <InfoIcon />
+                                    </IconButton>
+                                </NextLink>
+                            }
+                            />
+                        </GridListTile>
+                        
+                    ))
+                :
+                    <Typography variant="body1">
+                        No Images yet.
+                    </Typography>
                 }
             </GridList>
                
